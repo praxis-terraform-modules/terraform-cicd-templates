@@ -28,7 +28,14 @@ jobs:
         id: bump
         run: |
           LATEST=${{ steps.get_tag.outputs.latest_tag }}
-          COMMITS=$(git log ${LATEST}..HEAD --pretty=format:"%s")
+
+          # Handle first commit — no previous tag exists
+          if [ "$LATEST" = "v0.0.0" ]; then
+            COMMITS=$(git log --pretty=format:"%s")
+          else
+            COMMITS=$(git log ${LATEST}..HEAD --pretty=format:"%s")
+          fi
+
           echo "Commits since $LATEST:"
           echo "$COMMITS"
 
