@@ -1,0 +1,70 @@
+name: Terraform CI
+
+on:
+  workflow_call:
+    inputs:
+      terraform_version:
+        description: 'Terraform version'
+        type: string
+        default: '1.6.0'
+        required: false
+      working_directory:
+        description: 'Root directory to scan for modules'
+        type: string
+        default: 'modules'
+        required: false
+
+jobs:
+  validate:
+    name: Validate Terraform Modules
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ inputs.terraform_version }}
+
+      - name: Setup TFLint
+        uses: terraform-linters/setup-tflint@v4
+
+      - name: Terraform Format Check
+        run: |
+          echo "Checking formatting..."
+          for dir in ${{ inputs.working_directory }}/*/; do
+            echo "→ fmt check: $dir"
+            terraform -chdir=$dir fmt -check -recursive
+          done
+
+      - name: Terraform Init & Validate
+        run: |
+          echo "Validating modules..."
+          for dir in ${{ inputs.working_directory }}/*/; do
+            echo "→ init: $dir"
+            terraform -chdir=$dir init -backend=false
+            echo "→ validate: $dir"
+            terraform -chdir=$dir validate
+          done
+
+      - name: TFLint
+        run: |
+          echo "Linting modules..."
+          for dir in ${{ inputs.working_directory }}/*/; do
+            echo "→ tflint: $dir"
+            tflint --chdir=$dir
+          done
+
+      - name: Check for missing README
+        run: |
+          echo "Checking READMEs..."
+          for dir in ${{ inputs.working_directory }}/*/; do
+            if [ ! -f "$dir/README.md" ]; then
+              echo "❌ Missing README.md in $dir"
+              exit 1
+            else
+              echo "✅ README found in $dir"
+            fi
+          done
