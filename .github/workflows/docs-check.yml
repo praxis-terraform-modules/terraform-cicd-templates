@@ -1,0 +1,31 @@
+name: Documentation Check
+
+on:
+  workflow_call:
+    inputs:
+      working_dir:
+        description: 'Working directory for terraform-docs'
+        type: string
+        default: '.'
+        required: false
+      output_file:
+        description: 'Output file for terraform-docs'
+        type: string
+        default: 'README.md'
+        required: false
+
+jobs:
+  docs:
+    name: Documentation Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check terraform-docs drift
+        uses: terraform-docs/gh-actions@v1
+        with:
+          working-dir: ${{ inputs.working_dir }}
+          output-file: ${{ inputs.output_file }}
+          output-method: inject
+          fail-on-diff: true
