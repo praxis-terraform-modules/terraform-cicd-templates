@@ -1,0 +1,10 @@
+# .github/workflows/ci.yml
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate-title:
+    uses: praxis-terraform-modules/terraform-cicd-templates/.github/workflows/pr-title.yml@main
