@@ -33,7 +33,6 @@ jobs:
 
       - name: Terraform Format Check
         run: |
-          echo "Checking formatting..."
           for dir in ${{ inputs.working_directory }}/*/; do
             echo "→ fmt check: $dir"
             terraform -chdir=$dir fmt -check -recursive
@@ -41,7 +40,6 @@ jobs:
 
       - name: Terraform Init & Validate
         run: |
-          echo "Validating modules..."
           for dir in ${{ inputs.working_directory }}/*/; do
             echo "→ init: $dir"
             terraform -chdir=$dir init -backend=false
@@ -51,20 +49,17 @@ jobs:
 
       - name: TFLint
         run: |
-          echo "Linting modules..."
           for dir in ${{ inputs.working_directory }}/*/; do
             echo "→ tflint: $dir"
             tflint --chdir=$dir
           done
 
-      - name: Check for missing README
+      - name: Check README exists
         run: |
-          echo "Checking READMEs..."
           for dir in ${{ inputs.working_directory }}/*/; do
             if [ ! -f "$dir/README.md" ]; then
               echo "❌ Missing README.md in $dir"
               exit 1
-            else
-              echo "✅ README found in $dir"
             fi
+            echo "✅ README found in $dir"
           done

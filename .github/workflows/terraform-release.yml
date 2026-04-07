@@ -26,7 +26,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0        # needed for changelog generation
+          fetch-depth: 0
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
@@ -47,7 +47,7 @@ jobs:
         run: |
           PREV_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
           if [ -z "$PREV_TAG" ]; then
-            CHANGES=$(git log --pretty=format:"- %s" HEAD)
+            CHANGES=$(git log --pretty=format:"- %s")
           else
             CHANGES=$(git log --pretty=format:"- %s" ${PREV_TAG}..HEAD)
           fi
