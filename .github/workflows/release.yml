@@ -11,4 +11,4 @@ jobs:
   auto-tag:
     uses: praxis-terraform-modules/terraform-cicd-templates/.github/workflows/auto-tag.yml@main
     secrets:
-      github_token: ${{ secrets.GITHUB_TOKEN }}
+      token: ${{ secrets.GITHUB_TOKEN }}
