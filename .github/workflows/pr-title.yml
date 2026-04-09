@@ -10,23 +10,20 @@ jobs:
 
     steps:
       - name: Check PR title follows conventional commits
-        uses: amannn/action-semantic-pull-request@0723387faaf9b38adef4775cd42cfd5155ed6017 # v5.5.3
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          types: |
-            fix
-            feat
-            chore
-            docs
-            refactor
-            ci
-            test
-          requireScope: false
-          subjectPattern: ^.{10,100}$
-          subjectPatternError: |
-            PR title must be between 10-100 characters.
-            Examples:
-              fix: correct vpc cidr validation
-              feat: add private subnet support
-              feat!: rename input variables (breaking change)
+        run: |
+          TITLE="${{ github.event.pull_request.title }}"
+          echo "PR Title: $TITLE"
+
+          if echo "$TITLE" | grep -qE "^(fix|feat|chore|docs|refactor|ci|test)(\(.+\))?(!)?: .{10,100}$"; then
+            echo "✅ PR title is valid"
+          else
+            echo "❌ PR title must follow conventional commits format"
+            echo ""
+            echo "Pattern: type(optional-scope): description (10-100 chars)"
+            echo ""
+            echo "Examples:"
+            echo "  fix: correct vpc cidr validation"
+            echo "  feat: add private subnet support"
+            echo "  feat!: rename input variables (breaking change)"
+            exit 1
+          fi
