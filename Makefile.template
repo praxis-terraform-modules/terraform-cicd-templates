@@ -1,4 +1,4 @@
-.PHONY: fmt fmt-check docs docs-check validate lint security init pre-commit clean all ci
+.PHONY: fmt fmt-check docs docs-check validate lint security init pre-commit clean all ci test setup
 
 # Local dev - auto-fixes
 all: fmt docs validate lint
@@ -31,7 +31,7 @@ lint:
 
 security:
 	checkov -d . --config-file .checkov.yml --quiet
-	trivy config . --severity HIGH,CRITICAL --exit-code 1
+	trivy config . --severity HIGH,CRITICAL --exit-code 1 --skip-dirs .terraform
 
 pre-commit:
 	pre-commit run --all-files
@@ -41,3 +41,9 @@ clean:
 
 test: init
 	terraform test
+
+setup:
+	pip install checkov
+	brew install tflint terraform-docs trivy pre-commit 2>/dev/null || true
+	pre-commit install
+	@echo "Setup complete. Run 'make all' to verify."
