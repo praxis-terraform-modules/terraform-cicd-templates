@@ -25,7 +25,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        run: git clone --depth=1 https://github.com/${{ github.repository }}.git . && git checkout ${{ github.sha }}
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          git clone --depth=1 https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git .
+          git checkout ${{ github.sha }}
 
       - name: Setup Terraform
         run: |

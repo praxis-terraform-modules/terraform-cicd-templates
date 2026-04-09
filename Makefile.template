@@ -10,7 +10,7 @@ docs:
 	terraform-docs markdown table --indent 2 --output-mode inject --output-file README.md .
 
 # CI - check only, no auto-fix
-ci: fmt-check docs-check validate lint security
+ci: fmt-check docs-check validate lint security test
 
 fmt-check:
 	terraform fmt -check -recursive .
@@ -38,3 +38,6 @@ pre-commit:
 
 clean:
 	rm -rf .terraform .terraform.lock.hcl
+
+test: init
+	terraform test
