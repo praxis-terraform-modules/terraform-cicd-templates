@@ -1,3 +1,7 @@
+# Shared Makefile for Terraform modules
+# Source: praxis-terraform-modules/terraform-cicd-templates
+# Do not edit directly — update in terraform-cicd-templates repo
+
 .PHONY: fmt fmt-check docs docs-check validate lint security init pre-commit clean all ci test setup
 
 # Local dev - auto-fixes
@@ -48,3 +52,7 @@ setup:
 	terraform init -backend=false
 	pre-commit install
 	@echo "Setup complete. Run 'make all' to verify."
+
+update:
+	curl -sSLo .shared.mk https://raw.githubusercontent.com/praxis-terraform-modules/terraform-cicd-templates/main/shared.mk
+	@echo "Shared Makefile updated."

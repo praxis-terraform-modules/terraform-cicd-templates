@@ -1,0 +1,21 @@
+# Terraform Module Makefile
+# Run 'make setup' to configure your local environment.
+# All targets are defined in .shared.mk (downloaded from terraform-cicd-templates).
+
+SHARED_MK := .shared.mk
+SHARED_MK_URL := https://raw.githubusercontent.com/praxis-terraform-modules/terraform-cicd-templates/main/shared.mk
+
+# Download shared Makefile if missing
+$(SHARED_MK):
+	@echo "Downloading shared Makefile..."
+	@curl -sSLo $(SHARED_MK) $(SHARED_MK_URL) || { echo "Failed to download shared.mk. Run 'make setup' first or check network."; exit 1; }
+
+-include $(SHARED_MK)
+
+# Override setup to also download shared.mk
+setup: $(SHARED_MK)
+	pip install checkov
+	brew install tflint terraform-docs trivy pre-commit 2>/dev/null || true
+	terraform init -backend=false
+	pre-commit install
+	@echo "Setup complete. Run 'make all' to verify."
