@@ -45,11 +45,11 @@ jobs:
 
       - name: Setup terraform-docs
         run: |
-          LATEST=$(curl -s https://api.github.com/repos/terraform-docs/terraform-docs/releases/latest | grep tag_name | cut -d '"' -f 4)
-          curl -sSLo terraform-docs.tar.gz "https://github.com/terraform-docs/terraform-docs/releases/download/${LATEST}/terraform-docs-${LATEST}-linux-amd64.tar.gz"
-          tar -xzf terraform-docs.tar.gz
+          curl -sSLo terraform-docs.tar.gz https://github.com/terraform-docs/terraform-docs/releases/download/v0.19.0/terraform-docs-v0.19.0-linux-amd64.tar.gz
+          tar -xzf terraform-docs.tar.gz terraform-docs
           chmod +x terraform-docs
           sudo mv terraform-docs /usr/local/bin/
+          terraform-docs version
 
       - name: Setup Checkov
         run: pip install checkov
