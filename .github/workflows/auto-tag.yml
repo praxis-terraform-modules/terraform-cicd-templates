@@ -15,7 +15,7 @@ jobs:
     steps:
       - name: Checkout code
         run: |
-          git clone --depth=0 https://x-access-token:${{ secrets.token }}@github.com/${{ github.repository }}.git .
+          git clone https://x-access-token:${{ secrets.token }}@github.com/${{ github.repository }}.git .
           git fetch --tags
 
       - name: Get latest tag
