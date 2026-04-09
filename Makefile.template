@@ -40,7 +40,7 @@ clean:
 	rm -rf .terraform .terraform.lock.hcl
 
 test: init
-	terraform test
+	@if [ -d tests ]; then terraform test; else echo "No tests/ directory, skipping."; fi
 
 setup:
 	pip install checkov
