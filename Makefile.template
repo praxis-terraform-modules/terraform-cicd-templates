@@ -1,0 +1,40 @@
+.PHONY: fmt fmt-check docs docs-check validate lint security init pre-commit clean all ci
+
+# Local dev - auto-fixes
+all: fmt docs validate lint
+
+fmt:
+	terraform fmt -recursive .
+
+docs:
+	terraform-docs markdown table --indent 2 --output-mode inject --output-file README.md .
+
+# CI - check only, no auto-fix
+ci: fmt-check docs-check validate lint security
+
+fmt-check:
+	terraform fmt -check -recursive .
+
+docs-check:
+	terraform-docs markdown table --indent 2 --output-mode inject --output-file README.md .
+	git diff --exit-code README.md
+
+validate: init
+	terraform validate
+
+init:
+	terraform init -backend=false
+
+lint:
+	tflint --init
+	tflint
+
+security:
+	checkov -d . --config-file .checkov.yml --quiet
+	trivy config . --severity HIGH,CRITICAL --exit-code 1
+
+pre-commit:
+	pre-commit run --all-files
+
+clean:
+	rm -rf .terraform .terraform.lock.hcl

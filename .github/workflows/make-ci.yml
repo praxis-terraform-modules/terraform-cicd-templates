@@ -1,0 +1,48 @@
+name: Makefile CI
+
+on:
+  workflow_call:
+    inputs:
+      terraform_version:
+        description: 'Terraform version'
+        type: string
+        default: '1.8.0'
+        required: false
+      tflint_version:
+        description: 'TFLint version'
+        type: string
+        default: 'latest'
+        required: false
+      make_target:
+        description: 'Make target to run'
+        type: string
+        default: 'ci'
+        required: false
+
+jobs:
+  make-ci:
+    name: Make ${{ inputs.make_target }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ inputs.terraform_version }}
+
+      - name: Setup TFLint
+        uses: terraform-linters/setup-tflint@v4
+        with:
+          tflint_version: ${{ inputs.tflint_version }}
+
+      - name: Setup terraform-docs
+        run: |
+          curl -sSLo terraform-docs.tar.gz https://github.com/terraform-docs/terraform-docs/releases/latest/download/terraform-docs-v0.19.0-linux-amd64.tar.gz
+          tar -xzf terraform-docs.tar.gz
+          chmod +x terraform-docs
+          sudo mv terraform-docs /usr/local/bin/
+
+      - name: Run make ${{ inputs.make_target }}
+        run: make ${{ inputs.make_target }}
