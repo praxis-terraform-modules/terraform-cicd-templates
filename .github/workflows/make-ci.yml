@@ -19,8 +19,11 @@ on:
         default: 'ci'
         required: false
     secrets:
-      module_pat:
-        description: 'PAT for accessing private modules in the org'
+      app_id:
+        description: 'GitHub App ID for accessing private modules'
+        required: false
+      app_private_key:
+        description: 'GitHub App private key for accessing private modules'
         required: false
 
 jobs:
@@ -35,10 +38,18 @@ jobs:
           git clone --depth=1 https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git .
           git checkout ${{ github.sha }}
 
+      - name: Generate token for private modules
+        id: app-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.app_id }}
+          private-key: ${{ secrets.app_private_key }}
+          owner: praxis-terraform-modules
+
       - name: Configure git for private modules
         env:
-          MODULE_TOKEN: ${{ secrets.module_pat || github.token }}
-        run: git config --global url."https://oauth2:${MODULE_TOKEN}@github.com".insteadOf "https://github.com"
+          MODULE_TOKEN: ${{ steps.app-token.outputs.token }}
+        run: git config --global url."https://x-access-token:${MODULE_TOKEN}@github.com".insteadOf "https://github.com"
 
       - name: Determine Terraform version
         id: tf_version
