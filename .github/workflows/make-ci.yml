@@ -18,6 +18,10 @@ on:
         type: string
         default: 'ci'
         required: false
+    secrets:
+      module_pat:
+        description: 'PAT for accessing private modules in the org'
+        required: false
 
 jobs:
   make-ci:
@@ -33,8 +37,8 @@ jobs:
 
       - name: Configure git for private modules
         env:
-          GITHUB_TOKEN: ${{ github.token }}
-        run: git config --global url."https://oauth2:${GITHUB_TOKEN}@github.com".insteadOf "https://github.com"
+          MODULE_TOKEN: ${{ secrets.module_pat || github.token }}
+        run: git config --global url."https://oauth2:${MODULE_TOKEN}@github.com".insteadOf "https://github.com"
 
       - name: Determine Terraform version
         id: tf_version
