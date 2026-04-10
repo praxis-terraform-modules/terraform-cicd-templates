@@ -6,7 +6,7 @@ on:
       terraform_version:
         description: 'Terraform version'
         type: string
-        default: '1.8.0'
+        default: '1.9.0'
         required: false
       tflint_version:
         description: 'TFLint version'
