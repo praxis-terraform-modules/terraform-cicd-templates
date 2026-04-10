@@ -4,9 +4,9 @@ on:
   workflow_call:
     inputs:
       terraform_version:
-        description: 'Terraform version'
+        description: 'Terraform version (leave empty to auto-detect from .terraform-version)'
         type: string
-        default: '1.14.8'
+        default: ''
         required: false
       tflint_version:
         description: 'TFLint version'
@@ -31,9 +31,26 @@ jobs:
           git clone --depth=1 https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git .
           git checkout ${{ github.sha }}
 
+      - name: Configure git for private modules
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: git config --global url."https://oauth2:${GITHUB_TOKEN}@github.com".insteadOf "https://github.com"
+
+      - name: Determine Terraform version
+        id: tf_version
+        run: |
+          if [ -n "${{ inputs.terraform_version }}" ]; then
+            echo "version=${{ inputs.terraform_version }}" >> $GITHUB_OUTPUT
+          elif [ -f .terraform-version ]; then
+            echo "version=$(cat .terraform-version | tr -d '[:space:]')" >> $GITHUB_OUTPUT
+          else
+            echo "version=1.14.8" >> $GITHUB_OUTPUT
+          fi
+
       - name: Setup Terraform
         run: |
-          curl -sSLo terraform.zip https://releases.hashicorp.com/terraform/${{ inputs.terraform_version }}/terraform_${{ inputs.terraform_version }}_linux_amd64.zip
+          TF_VERSION=${{ steps.tf_version.outputs.version }}
+          curl -sSLo terraform.zip https://releases.hashicorp.com/terraform/${TF_VERSION}/terraform_${TF_VERSION}_linux_amd64.zip
           unzip -o terraform.zip
           sudo mv terraform /usr/local/bin/
           terraform version
